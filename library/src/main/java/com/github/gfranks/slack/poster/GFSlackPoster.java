@@ -1,8 +1,8 @@
 package com.github.gfranks.slack.poster;
 
-import com.github.gfranks.slack.poster.model.SlackAttachment;
-import com.github.gfranks.slack.poster.model.SlackBody;
-import com.github.gfranks.slack.poster.service.SlackService;
+import com.github.gfranks.slack.poster.model.GFSlackAttachment;
+import com.github.gfranks.slack.poster.model.GFSlackBody;
+import com.github.gfranks.slack.poster.service.GFSlackService;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.GsonBuilder;
 
@@ -18,14 +18,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class SlackPoster {
+public class GFSlackPoster {
 
     public static final String TAG = "slack_poster";
 
     private String mWebhookPath1, mWebhookPath2, mWebhookPath3;
-    private SlackService mSlackService;
+    private GFSlackService mSlackService;
 
-    public SlackPoster(String webhookPath1, String webhookPath2, String webhookPath3) {
+    public GFSlackPoster(String webhookPath1, String webhookPath2, String webhookPath3) {
         mWebhookPath1 = webhookPath1;
         mWebhookPath2 = webhookPath2;
         mWebhookPath3 = webhookPath3;
@@ -45,14 +45,14 @@ public class SlackPoster {
                         .readTimeout(13000, TimeUnit.MILLISECONDS)
                         .writeTimeout(3000, TimeUnit.MILLISECONDS)
                         .build())
-                .build().create(SlackService.class);
+                .build().create(GFSlackService.class);
     }
 
-    public void postToSlack(String appName, String message, List<SlackAttachment> slackAttachments) {
+    public void postToSlack(String appName, String message, List<GFSlackAttachment> slackAttachments) {
         postToSlack(appName, message, slackAttachments, false);
     }
 
-    private void postToSlack(String appName, String message, List<SlackAttachment> attachments, boolean isCrashReport) {
+    private void postToSlack(String appName, String message, List<GFSlackAttachment> attachments, boolean isCrashReport) {
         postToSlack(appName, message, attachments, isCrashReport, new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -64,9 +64,9 @@ public class SlackPoster {
         });
     }
 
-    private void postToSlack(String appName, String message, List<SlackAttachment> attachments, boolean isCrashReport, Callback<ResponseBody> callback) {
+    private void postToSlack(String appName, String message, List<GFSlackAttachment> attachments, boolean isCrashReport, Callback<ResponseBody> callback) {
 
-        SlackBody.Builder slackBodyBuilder= new SlackBody.Builder()
+        GFSlackBody.Builder slackBodyBuilder= new GFSlackBody.Builder()
                 .setUsername(appName)
                 .setAttachments(attachments);
 

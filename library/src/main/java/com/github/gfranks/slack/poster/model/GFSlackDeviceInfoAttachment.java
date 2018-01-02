@@ -5,7 +5,7 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.util.DisplayMetrics;
 
-public class SlackDeviceInfoAttachment extends SlackAttachment {
+public class GFSlackDeviceInfoAttachment extends GFSlackAttachment {
 
     private String make;
     private String model;
@@ -14,21 +14,25 @@ public class SlackDeviceInfoAttachment extends SlackAttachment {
     private String release;
     private String api;
 
-    public SlackDeviceInfoAttachment() {
+    public GFSlackDeviceInfoAttachment() {
         super();
         setTitle("Device Info");
         setColor("#03A9F4");
         getFields().get(0).setShort(false);
     }
 
-    public SlackDeviceInfoAttachment(Builder builder) {
-        this();
+    public GFSlackDeviceInfoAttachment(Builder builder) {
+        super(builder);
+        setTitle("Device Info");
+        setColor("#03A9F4");
+        getFields().get(0).setShort(false);
         make = builder.make;
         model = builder.model;
         deviceResolution = builder.deviceResolution;
         deviceDensity = builder.deviceDensity;
         release = builder.release;
         api = builder.api;
+        setValues();
     }
 
     public String getMake() {
@@ -37,6 +41,7 @@ public class SlackDeviceInfoAttachment extends SlackAttachment {
 
     public void setMake(String make) {
         this.make = make;
+        setValues();
     }
 
     public String getModel() {
@@ -45,6 +50,7 @@ public class SlackDeviceInfoAttachment extends SlackAttachment {
 
     public void setModel(String model) {
         this.model = model;
+        setValues();
     }
 
     public String getDeviceResolution() {
@@ -53,6 +59,7 @@ public class SlackDeviceInfoAttachment extends SlackAttachment {
 
     public void setDeviceResolution(String deviceResolution) {
         this.deviceResolution = deviceResolution;
+        setValues();
     }
 
     public String getDeviceDensity() {
@@ -61,6 +68,7 @@ public class SlackDeviceInfoAttachment extends SlackAttachment {
 
     public void setDeviceDensity(String deviceDensity) {
         this.deviceDensity = deviceDensity;
+        setValues();
     }
 
     public String getRelease() {
@@ -69,6 +77,7 @@ public class SlackDeviceInfoAttachment extends SlackAttachment {
 
     public void setRelease(String release) {
         this.release = release;
+        setValues();
     }
 
     public String getApi() {
@@ -77,11 +86,11 @@ public class SlackDeviceInfoAttachment extends SlackAttachment {
 
     public void setApi(String api) {
         this.api = api;
+        setValues();
     }
 
-    @Override
-    public String getText() {
-        SlackAttachment.Builder builder = new SlackAttachment.Builder();
+    private void setValues() {
+        GFSlackAttachment.Builder builder = new GFSlackAttachment.Builder();
         StringBuilder sb = new StringBuilder();
         sb.append("Make: ");
         sb.append(make);
@@ -102,7 +111,7 @@ public class SlackDeviceInfoAttachment extends SlackAttachment {
         sb.append("\n");
         sb.append("Api: ");
         sb.append(api);
-        return sb.toString();
+        setText(sb.toString());
     }
 
     public static class SimpleBuilder extends Builder {
@@ -124,6 +133,48 @@ public class SlackDeviceInfoAttachment extends SlackAttachment {
 
             setRelease(Build.VERSION.RELEASE);
             setApi(String.valueOf(Build.VERSION.SDK_INT));
+        }
+
+        @Override
+        public SimpleBuilder setFallback(String fallback) {
+            super.setFallback(fallback);
+
+            return this;
+        }
+
+        @Override
+        public SimpleBuilder setColor(String color) {
+            super.setColor(color);
+
+            return this;
+        }
+
+        @Override
+        public SimpleBuilder setTitle(String title) {
+            super.setTitle(title);
+
+            return this;
+        }
+
+        @Override
+        public SimpleBuilder setText(String text) {
+            super.setText(text);
+
+            return this;
+        }
+
+        @Override
+        public SimpleBuilder setFooter(String footer) {
+            super.setFooter(footer);
+
+            return this;
+        }
+
+        @Override
+        public SimpleBuilder setFooterIcon(String footerIcon) {
+            super.setFooterIcon(footerIcon);
+
+            return this;
         }
 
         private String truncateAt(String string, int length) {
@@ -176,7 +227,7 @@ public class SlackDeviceInfoAttachment extends SlackAttachment {
         }
     }
 
-    public static class Builder {
+    public static class Builder extends GFSlackAttachment.Builder {
 
         private String make;
         private String model;
@@ -221,8 +272,51 @@ public class SlackDeviceInfoAttachment extends SlackAttachment {
             return this;
         }
 
-        public SlackDeviceInfoAttachment build() {
-            return new SlackDeviceInfoAttachment(this);
+        @Override
+        public Builder setFallback(String fallback) {
+            super.setFallback(fallback);
+
+            return this;
+        }
+
+        @Override
+        public Builder setColor(String color) {
+            super.setColor(color);
+
+            return this;
+        }
+
+        @Override
+        public Builder setTitle(String title) {
+            super.setTitle(title);
+
+            return this;
+        }
+
+        @Override
+        public Builder setText(String text) {
+            super.setText(text);
+
+            return this;
+        }
+
+        @Override
+        public Builder setFooter(String footer) {
+            super.setFooter(footer);
+
+            return this;
+        }
+
+        @Override
+        public Builder setFooterIcon(String footerIcon) {
+            super.setFooterIcon(footerIcon);
+
+            return this;
+        }
+
+        @Override
+        public GFSlackDeviceInfoAttachment build() {
+            return new GFSlackDeviceInfoAttachment(this);
         }
     }
 }

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SlackAttachment {
+public class GFSlackAttachment {
 
     @SerializedName("fallback")
     private String fallback;
@@ -24,17 +24,20 @@ public class SlackAttachment {
     @SerializedName("footer_icon")
     private String footerIcon;
 
-    public SlackAttachment() {
-        fallback = "Logcat Summary";
+    public GFSlackAttachment() {
+        fallback = "Attachment";
         color = "#5DA7C1";
         fields = new ArrayList<>();
         fields.add(new SlackField());
 
-        setIncludeFooter(true);
+        ts = System.currentTimeMillis() / 1000;
     }
 
-    public SlackAttachment(Builder builder) {
+    public GFSlackAttachment(Builder builder) {
         this();
+        if (builder.fallback != null && builder.fallback.length() > 0) {
+            this.fallback = builder.fallback;
+        }
         if (builder.color != null && builder.color.length() > 0) {
             this.color = builder.color;
         }
@@ -44,7 +47,8 @@ public class SlackAttachment {
             this.title = "Logcat Summary";
         }
         this.text = builder.text;
-        setIncludeFooter(builder.includeFooter);
+        setFooter(builder.footer);
+        setFooterIcon(builder.footerIcon);
     }
 
     public String getFallback() {
@@ -111,24 +115,20 @@ public class SlackAttachment {
         this.footerIcon = footerIcon;
     }
 
-    public void setIncludeFooter(boolean includeFooter) {
-        if (includeFooter) {
-            footer = "LawnTap Slack API";
-            footerIcon = "https://www.lawntap.com/wp-content/uploads/2017/11/Lawntap-Logo-e1511320770929.png";
-            ts = System.currentTimeMillis() / 1000;
-        } else {
-            footer = null;
-            footerIcon = null;
-            ts = null;
-        }
-    }
-
     public static class Builder {
 
+        private String fallback;
         private String color;
         private String title;
         private String text;
-        private boolean includeFooter;
+        private String footer;
+        private String footerIcon;
+
+        public Builder setFallback(String fallback) {
+            this.fallback = fallback;
+
+            return this;
+        }
 
         public Builder setColor(String color) {
             this.color = color;
@@ -148,14 +148,20 @@ public class SlackAttachment {
             return this;
         }
 
-        public Builder setIncludeFooter(boolean includeFooter) {
-            this.includeFooter = includeFooter;
+        public Builder setFooter(String footer) {
+            this.footer = footer;
 
             return this;
         }
 
-        public SlackAttachment build() {
-            return new SlackAttachment(this);
+        public Builder setFooterIcon(String footerIcon) {
+            this.footerIcon = footerIcon;
+
+            return this;
+        }
+
+        public GFSlackAttachment build() {
+            return new GFSlackAttachment(this);
         }
     }
 

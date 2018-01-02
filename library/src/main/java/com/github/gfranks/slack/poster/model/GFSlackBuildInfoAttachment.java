@@ -1,6 +1,6 @@
 package com.github.gfranks.slack.poster.model;
 
-public class SlackBuildInfoAttachment extends SlackAttachment {
+public class GFSlackBuildInfoAttachment extends GFSlackAttachment {
 
     private String applicationId;
     private String versionName;
@@ -8,20 +8,24 @@ public class SlackBuildInfoAttachment extends SlackAttachment {
     private String sha;
     private String buildDate;
 
-    public SlackBuildInfoAttachment() {
+    public GFSlackBuildInfoAttachment() {
         super();
         setTitle("Build Info");
         setColor("#FEC418");
         getFields().get(0).setShort(false);
     }
 
-    public SlackBuildInfoAttachment(Builder builder) {
-        this();
+    public GFSlackBuildInfoAttachment(Builder builder) {
+        super(builder);
+        setTitle("Build Info");
+        setColor("#FEC418");
+        getFields().get(0).setShort(false);
         applicationId = builder.applicationId;
         versionName = builder.versionName;
         versionCode = builder.versionCode;
         sha = builder.sha;
         buildDate = builder.buildDate;
+        setValues();
     }
 
     public String getApplicationId() {
@@ -30,6 +34,7 @@ public class SlackBuildInfoAttachment extends SlackAttachment {
 
     public void setApplicationId(String applicationId) {
         this.applicationId = applicationId;
+        setValues();
     }
 
     public String getVersionName() {
@@ -38,6 +43,7 @@ public class SlackBuildInfoAttachment extends SlackAttachment {
 
     public void setVersionName(String versionName) {
         this.versionName = versionName;
+        setValues();
     }
 
     public String getVersionCode() {
@@ -46,6 +52,7 @@ public class SlackBuildInfoAttachment extends SlackAttachment {
 
     public void setVersionCode(String versionCode) {
         this.versionCode = versionCode;
+        setValues();
     }
 
     public String getSha() {
@@ -54,6 +61,7 @@ public class SlackBuildInfoAttachment extends SlackAttachment {
 
     public void setSha(String sha) {
         this.sha = sha;
+        setValues();
     }
 
     public String getBuildDate() {
@@ -62,10 +70,10 @@ public class SlackBuildInfoAttachment extends SlackAttachment {
 
     public void setBuildDate(String buildDate) {
         this.buildDate = buildDate;
+        setValues();
     }
 
-    @Override
-    public String getText() {
+    private void setValues() {
         StringBuilder sb = new StringBuilder();
         sb.append("Application ID: ");
         sb.append(applicationId);
@@ -82,10 +90,10 @@ public class SlackBuildInfoAttachment extends SlackAttachment {
         sb.append("Date of Build: ");
         sb.append(buildDate);
         sb.append("\n");
-        return sb.toString();
+        setText(sb.toString());
     }
 
-    public static class Builder {
+    public static class Builder extends GFSlackAttachment.Builder {
 
         private String applicationId;
         private String versionName;
@@ -123,8 +131,51 @@ public class SlackBuildInfoAttachment extends SlackAttachment {
             return this;
         }
 
-        public SlackBuildInfoAttachment build() {
-            return new SlackBuildInfoAttachment(this);
+        @Override
+        public Builder setFallback(String fallback) {
+            super.setFallback(fallback);
+
+            return this;
+        }
+
+        @Override
+        public Builder setColor(String color) {
+            super.setColor(color);
+
+            return this;
+        }
+
+        @Override
+        public Builder setTitle(String title) {
+            super.setTitle(title);
+
+            return this;
+        }
+
+        @Override
+        public Builder setText(String text) {
+            super.setText(text);
+
+            return this;
+        }
+
+        @Override
+        public Builder setFooter(String footer) {
+            super.setFooter(footer);
+
+            return this;
+        }
+
+        @Override
+        public Builder setFooterIcon(String footerIcon) {
+            super.setFooterIcon(footerIcon);
+
+            return this;
+        }
+
+        @Override
+        public GFSlackBuildInfoAttachment build() {
+            return new GFSlackBuildInfoAttachment(this);
         }
     }
 }

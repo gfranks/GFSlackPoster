@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class SlackBody {
+public class GFSlackBody {
 
     @SerializedName("text")
     private String text;
@@ -15,14 +15,14 @@ public class SlackBody {
     @SerializedName("icon_emoji")
     private String iconEmoji;
     @SerializedName("attachments")
-    private List<SlackAttachment> attachments;
+    private List<GFSlackAttachment> attachments;
 
-    public SlackBody() {
+    public GFSlackBody() {
         channel = "#notifications";
         iconEmoji = ":leaf:";
     }
 
-    public SlackBody(Builder builder) {
+    public GFSlackBody(Builder builder) {
         this();
         text = builder.text;
 
@@ -69,11 +69,11 @@ public class SlackBody {
         this.iconEmoji = iconEmoji;
     }
 
-    public List<SlackAttachment> getAttachments() {
+    public List<GFSlackAttachment> getAttachments() {
         return attachments;
     }
 
-    public void setAttachments(List<SlackAttachment> attachments) {
+    public void setAttachments(List<GFSlackAttachment> attachments) {
         this.attachments = attachments;
     }
 
@@ -82,7 +82,7 @@ public class SlackBody {
         private String text;
         private String channel;
         private String username;
-        private List<SlackAttachment> attachments;
+        private List<GFSlackAttachment> attachments;
 
         public Builder setText(String text) {
             this.text = text;
@@ -102,14 +102,14 @@ public class SlackBody {
             return this;
         }
 
-        public Builder setAttachments(List<SlackAttachment> attachments) {
+        public Builder setAttachments(List<GFSlackAttachment> attachments) {
             this.attachments = attachments;
 
             return this;
         }
 
-        public SlackBody build() {
-            return new SlackBody(this);
+        public GFSlackBody build() {
+            return new GFSlackBody(this);
         }
     }
 }

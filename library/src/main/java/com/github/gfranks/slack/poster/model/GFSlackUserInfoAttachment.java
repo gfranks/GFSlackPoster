@@ -1,25 +1,29 @@
 package com.github.gfranks.slack.poster.model;
 
-public class SlackUserInfoAttachment extends SlackAttachment {
+public class GFSlackUserInfoAttachment extends GFSlackAttachment {
 
     private String name;
     private String id;
     private String email;
     private String phone;
 
-    public SlackUserInfoAttachment() {
+    public GFSlackUserInfoAttachment() {
         super();
         setTitle("User Info");
         setColor("#000000");
         getFields().get(0).setShort(false);
     }
 
-    public SlackUserInfoAttachment(Builder builder) {
-        this();
+    public GFSlackUserInfoAttachment(Builder builder) {
+        super(builder);
+        setTitle("User Info");
+        setColor("#000000");
+        getFields().get(0).setShort(false);
         name = builder.name;
         id = builder.id;
         email = builder.email;
         phone = builder.phone;
+        setValues();
     }
 
     public String getName() {
@@ -28,6 +32,7 @@ public class SlackUserInfoAttachment extends SlackAttachment {
 
     public void setName(String name) {
         this.name = name;
+        setValues();
     }
 
     public String getId() {
@@ -36,6 +41,7 @@ public class SlackUserInfoAttachment extends SlackAttachment {
 
     public void setId(String id) {
         this.id = id;
+        setValues();
     }
 
     public String getEmail() {
@@ -44,6 +50,7 @@ public class SlackUserInfoAttachment extends SlackAttachment {
 
     public void setEmail(String email) {
         this.email = email;
+        setValues();
     }
 
     public String getPhone() {
@@ -52,10 +59,10 @@ public class SlackUserInfoAttachment extends SlackAttachment {
 
     public void setPhone(String phone) {
         this.phone = phone;
+        setValues();
     }
 
-    @Override
-    public String getText() {
+    private void setValues() {
         StringBuilder sb = new StringBuilder();
         sb.append("Name: ");
         sb.append(name);
@@ -68,10 +75,10 @@ public class SlackUserInfoAttachment extends SlackAttachment {
         sb.append("\n");
         sb.append("Phone: ");
         sb.append(phone);
-        return sb.toString();
+        setText(sb.toString());
     }
 
-    public static class Builder {
+    public static class Builder extends GFSlackAttachment.Builder {
 
         private String name;
         private String id;
@@ -102,8 +109,51 @@ public class SlackUserInfoAttachment extends SlackAttachment {
             return this;
         }
 
-        public SlackUserInfoAttachment build() {
-            return new SlackUserInfoAttachment(this);
+        @Override
+        public Builder setFallback(String fallback) {
+            super.setFallback(fallback);
+
+            return this;
+        }
+
+        @Override
+        public Builder setColor(String color) {
+            super.setColor(color);
+
+            return this;
+        }
+
+        @Override
+        public Builder setTitle(String title) {
+            super.setTitle(title);
+
+            return this;
+        }
+
+        @Override
+        public Builder setText(String text) {
+            super.setText(text);
+
+            return this;
+        }
+
+        @Override
+        public Builder setFooter(String footer) {
+            super.setFooter(footer);
+
+            return this;
+        }
+
+        @Override
+        public Builder setFooterIcon(String footerIcon) {
+            super.setFooterIcon(footerIcon);
+
+            return this;
+        }
+
+        @Override
+        public GFSlackUserInfoAttachment build() {
+            return new GFSlackUserInfoAttachment(this);
         }
     }
 }
