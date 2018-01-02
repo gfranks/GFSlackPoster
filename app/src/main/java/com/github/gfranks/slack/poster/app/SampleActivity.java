@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.github.gfranks.slack.poster.GFSlackPoster;
 import com.github.gfranks.slack.poster.model.GFSlackAppUsageInfoAttachment;
 import com.github.gfranks.slack.poster.model.GFSlackAttachment;
+import com.github.gfranks.slack.poster.model.GFSlackBody;
 import com.github.gfranks.slack.poster.model.GFSlackBuildInfoAttachment;
 import com.github.gfranks.slack.poster.model.GFSlackDeviceInfoAttachment;
 import com.github.gfranks.slack.poster.model.GFSlackLogcatAttachment;
@@ -28,7 +29,7 @@ import retrofit2.Response;
 
 public class SampleActivity extends AppCompatActivity implements View.OnClickListener {
 
-    EditText mWebhook1, mWebhook2, mWebhook3, mMessage;
+    EditText mWebhook1, mWebhook2, mWebhook3, mChannel, mMessage;
     CheckBox mIncludeLogcat;
 
     @Override
@@ -41,6 +42,7 @@ public class SampleActivity extends AppCompatActivity implements View.OnClickLis
         mWebhook1 = (EditText) findViewById(R.id.webhook_path_1);
         mWebhook2 = (EditText) findViewById(R.id.webhook_path_2);
         mWebhook3 = (EditText) findViewById(R.id.webhook_path_3);
+        mChannel = (EditText) findViewById(R.id.channel);
         mMessage = (EditText) findViewById(R.id.message);
         mIncludeLogcat = (CheckBox) findViewById(R.id.include_logcat);
         findViewById(R.id.submit).setOnClickListener(this);
@@ -83,13 +85,17 @@ public class SampleActivity extends AppCompatActivity implements View.OnClickLis
                                 attachment.setTs(System.currentTimeMillis() / 1000);
                                 attachments.add(attachment);
                             }
-                            new GFSlackPoster(mWebhook1.getText().toString(), mWebhook2.getText().toString(), mWebhook3.getText().toString())
-                                    .postToSlack(getString(R.string.app_name), mMessage.getText().toString(), attachments, callback);
+                            GFSlackPoster slackPoster = GFSlackPoster.newInstance(mWebhook1.getText().toString(), mWebhook2.getText().toString(), mWebhook3.getText().toString());
+                            GFSlackBody slackBody = slackPoster.createSlackBody(getString(R.string.app_name), mMessage.getText().toString(), attachments);
+                            slackBody.setChannel(mChannel.getText().toString());
+                            slackPoster.postToSlack(slackBody, callback);
                         }
                     });
         } else {
-            new GFSlackPoster(mWebhook1.getText().toString(), mWebhook2.getText().toString(), mWebhook3.getText().toString())
-                    .postToSlack(getString(R.string.app_name), mMessage.getText().toString(), getAttachments(), callback);
+            GFSlackPoster slackPoster = GFSlackPoster.newInstance(mWebhook1.getText().toString(), mWebhook2.getText().toString(), mWebhook3.getText().toString());
+            GFSlackBody slackBody = slackPoster.createSlackBody(getString(R.string.app_name), mMessage.getText().toString(), getAttachments());
+            slackBody.setChannel(mChannel.getText().toString());
+            slackPoster.postToSlack(slackBody, callback);
         }
 
     }

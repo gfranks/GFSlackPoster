@@ -21,14 +21,20 @@ Create Slack Poster
 ```java
 // Your basic webhook url will look something like `https://hooks.slack.com/1234/abcd/1a2b3c4d` with 3 path parameters.
 // These path parameters will be used to construct our slack poster.
-GFSlackPoster slackPoster = new GFSlackPoster(webhookPath1, webhookPath2, webhookPath3);
+GFSlackPoster slackPoster = GFSlackPoster.newInstance(webhookPath1, webhookPath2, webhookPath3);
 
 // Create a List of GFSlackAttachments
 List<GFSlackAttachment> attachments = new ArrayList<>();
 // see below for attachment options
 
+// Create your Slack Body
+GFSlackBody slackBody = slackPoster.createSlackBody(appName, customMessage, attachments);
+slackBody.setChannel("some_channel"); // set your slack channel -- REQUIRED
+slackBody.setIconEmoji(":wave:"); // Optional slack emoji to use
+slackBody.setText(String); // Optional message to be displayed
+
 // Make the call to post to your slack channel with your app name, any custom message, and your attachments
-slackPoster.postToSlack(appName, customMessage, attachments);
+slackPoster.postToSlack(slackBody);
 ```
 
 ### Attachment Options

@@ -18,8 +18,6 @@ public class GFSlackBody {
     private List<GFSlackAttachment> attachments;
 
     public GFSlackBody() {
-        channel = "#notifications";
-        iconEmoji = ":leaf:";
     }
 
     public GFSlackBody(Builder builder) {
