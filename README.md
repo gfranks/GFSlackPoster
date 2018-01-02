@@ -10,9 +10,11 @@ How To Use It:
 
 ### Basic Example
 
-Add permission to read logs to your manifest
+Add permissions your manifest
 ```java
 <uses-permission android:name="android.permission.READ_LOGS" />
+<uses-permission android:name="android.permission.INTERNET"
+        android:required="true" />
 ```
 
 ```java
