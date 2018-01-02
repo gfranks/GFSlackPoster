@@ -29,8 +29,6 @@ public class GFSlackAttachment {
         color = "#5DA7C1";
         fields = new ArrayList<>();
         fields.add(new SlackField());
-
-        ts = System.currentTimeMillis() / 1000;
     }
 
     public GFSlackAttachment(Builder builder) {
@@ -49,6 +47,9 @@ public class GFSlackAttachment {
         this.text = builder.text;
         setFooter(builder.footer);
         setFooterIcon(builder.footerIcon);
+        if ((footer != null && footer.length() > 0) || (footerIcon != null && footerIcon.length() > 0)) {
+            ts = System.currentTimeMillis() / 1000;
+        }
     }
 
     public String getFallback() {
@@ -105,6 +106,10 @@ public class GFSlackAttachment {
 
     public void setFooter(String footer) {
         this.footer = footer;
+
+        if (footer != null && footer.length() > 0) {
+            ts = System.currentTimeMillis() / 1000;
+        }
     }
 
     public String getFooterIcon() {
@@ -113,6 +118,10 @@ public class GFSlackAttachment {
 
     public void setFooterIcon(String footerIcon) {
         this.footerIcon = footerIcon;
+
+        if (footerIcon != null && footerIcon.length() > 0) {
+            ts = System.currentTimeMillis() / 1000;
+        }
     }
 
     public static class Builder {

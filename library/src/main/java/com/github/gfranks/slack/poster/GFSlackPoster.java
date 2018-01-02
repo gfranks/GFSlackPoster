@@ -52,6 +52,10 @@ public class GFSlackPoster {
         postToSlack(appName, message, slackAttachments, false);
     }
 
+    public void postToSlack(String appName, String message, List<GFSlackAttachment> slackAttachments, Callback<ResponseBody> callback) {
+        postToSlack(appName, message, slackAttachments, false, callback);
+    }
+
     private void postToSlack(String appName, String message, List<GFSlackAttachment> attachments, boolean isCrashReport) {
         postToSlack(appName, message, attachments, isCrashReport, new Callback<ResponseBody>() {
             @Override
@@ -65,8 +69,7 @@ public class GFSlackPoster {
     }
 
     private void postToSlack(String appName, String message, List<GFSlackAttachment> attachments, boolean isCrashReport, Callback<ResponseBody> callback) {
-
-        GFSlackBody.Builder slackBodyBuilder= new GFSlackBody.Builder()
+        GFSlackBody.Builder slackBodyBuilder = new GFSlackBody.Builder()
                 .setUsername(appName)
                 .setAttachments(attachments);
 

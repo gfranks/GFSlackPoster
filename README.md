@@ -10,6 +10,11 @@ How To Use It:
 
 ### Basic Example
 
+Add permission to read logs to your manifest
+```java
+<uses-permission android:name="android.permission.READ_LOGS" />
+```
+
 ```java
 // Your basic webhook url will look something like `https://hooks.slack.com/1234/abcd/1a2b3c4d` with 3 path parameters.
 // These path parameters will be used to construct our slack poster.
@@ -82,7 +87,7 @@ GFSlackDeviceInfoAttachment attachment = new GFSlackDeviceInfoAttachment.SimpleB
 ```java
 GFSlackLogcatAttachment.Builder attachmentBuilder = new GFSlackLogcatAttachment.Builder();
 attachmentBuilder.setProcessId(int); // your application's process id to monitor -- REQUIRED
-attachmentBuilder.setCrashSummary(boolean); // indicates we should only look for error logs for your application' process
+attachmentBuilder.setLineCount(int); // set the number of lines to capture from the log, defaults to 125
 attachmentBuilder.build(Map<String, Object> extras, new OnSlackLogcatAttachmentAvailableListener() {
     @Override
     public void onSlackLogcatAttachmentAvailable(GFSlackLogcatAttachment attachment, Map<String, Object> extras) {

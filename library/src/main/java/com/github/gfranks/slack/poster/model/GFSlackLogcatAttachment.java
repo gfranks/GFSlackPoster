@@ -1,12 +1,11 @@
 package com.github.gfranks.slack.poster.model;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class GFSlackLogcatAttachment extends GFSlackAttachment {
 
@@ -15,35 +14,37 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment {
     }
 
     private GFSlackLogcatAttachment(Builder builder) {
-        this();
-        if (builder.isCrashSummary) {
-            setTitle("Crash Summary");
-            setColor("#FF4351");
-        }
-        setText(builder.text);
+        super(builder);
+        setTitle("Logcat Summary");
+        setColor("#FF4081");
     }
 
     public void setCrashSummary(boolean crashSummary) {
-        if (crashSummary) {
-            setTitle("Crash Summary");
-            setColor("#FF4351");
-        }
+        setTitle("Logcat Summary");
+        setColor("#FF4081");
+    }
+
+    public interface OnSlackLogcatAttachmentAvailableListener {
+        void onSlackLogcatAttachmentAvailable(GFSlackLogcatAttachment attachment, Map<String, Object> extras);
     }
 
     public static class Builder extends GFSlackAttachment.Builder {
 
         private Integer processId;
-        private String text;
-        private boolean isCrashSummary;
+        private int lineCount;
 
-        public Builder setCrashSummary(boolean crashSummary) {
-            isCrashSummary = crashSummary;
-
-            return this;
+        public Builder() {
+            lineCount = 125;
         }
 
         public Builder setProcessId(int processId) {
             this.processId = processId;
+
+            return this;
+        }
+
+        public Builder setLineCount(int lineCount) {
+            this.lineCount = lineCount;
 
             return this;
         }
@@ -99,14 +100,14 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment {
             if (processId == null) {
                 throw new IllegalStateException("You must set a process id -- #setProcessId(int) on the builder");
             }
-            new LogcatAsyncTask(processId, isCrashSummary, null, onSlackLogcatAttachmentAvailableListener).execute();
+            new LogcatAsyncTask(processId, lineCount, null, onSlackLogcatAttachmentAvailableListener).execute(this);
         }
 
         public void build(Map<String, Object> extras, OnSlackLogcatAttachmentAvailableListener onSlackLogcatAttachmentAvailableListener) {
             if (processId == null) {
                 throw new IllegalStateException("You must set a process id -- #setProcessId(int) on the builder");
             }
-            new LogcatAsyncTask(processId, isCrashSummary, extras, onSlackLogcatAttachmentAvailableListener).execute();
+            new LogcatAsyncTask(processId, lineCount, extras, onSlackLogcatAttachmentAvailableListener).execute(this);
         }
 
         GFSlackLogcatAttachment internalBuild() {
@@ -114,97 +115,36 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment {
         }
     }
 
-    public interface OnSlackLogcatAttachmentAvailableListener {
-        void onSlackLogcatAttachmentAvailable(GFSlackLogcatAttachment attachment, Map<String, Object> extras);
-    }
-
-    private static class LogcatAsyncTask extends AsyncTask<Void, Void, GFSlackLogcatAttachment> {
+    private static class LogcatAsyncTask extends AsyncTask<GFSlackLogcatAttachment.Builder, Void, GFSlackLogcatAttachment> {
 
         private int mProcessId;
-        private boolean mIsCrashSummary;
+        private int mLineCount;
         private Map<String, Object> mExtras;
         private OnSlackLogcatAttachmentAvailableListener mOnSlackLogcatAttachmentAvailableListener;
 
-        public LogcatAsyncTask(int processId, boolean isCrashSummary, Map<String, Object> extras, OnSlackLogcatAttachmentAvailableListener onSlackLogcatAttachmentAvailableListener) {
+        public LogcatAsyncTask(int processId, int lineCount, Map<String, Object> extras, OnSlackLogcatAttachmentAvailableListener onSlackLogcatAttachmentAvailableListener) {
             mProcessId = processId;
-            mIsCrashSummary = isCrashSummary;
+            mLineCount = lineCount;
             mExtras = extras;
             mOnSlackLogcatAttachmentAvailableListener = onSlackLogcatAttachmentAvailableListener;
         }
 
         @Override
-        protected GFSlackLogcatAttachment doInBackground(Void... voids) {
-            GFSlackLogcatAttachment.Builder builder = new GFSlackLogcatAttachment.Builder();
-            builder.setCrashSummary(mIsCrashSummary);
+        protected GFSlackLogcatAttachment doInBackground(GFSlackLogcatAttachment.Builder... builders) {
+            GFSlackLogcatAttachment.Builder builder = builders[0];
+
             try {
-                Process process;
-                if (mIsCrashSummary) {
-                    process = Runtime.getRuntime().exec("logcat -d");
-                } else {
-                    process = Runtime.getRuntime().exec("logcat");
-                }
-                BufferedReader bufferedReader =
-                        new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-                int maxLines = 0;
-                int lines = 0;
                 StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    if(line.contains(Integer.toString(mProcessId))) {
-                        if (line.contains("[") && line.contains("]")) {
-                            try {
-                                if (Pattern.matches("^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?),\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$",
-                                        line.substring(line.indexOf("[") + 1, line.indexOf("]")))) {
-                                    sb.append("[...]");
-                                    --lines;
-                                } else if (line.contains("[") && line.contains("]") && line.contains(",") && line.contains(".")) {
-                                    sb.append("[...]");
-                                    --lines;
-                                } else if (line.contains("type") && line.contains("Polygon")) {
-                                    sb.append("[...]");
-                                    --lines;
-                                } else {
-                                    sb.append(line);
-                                    sb.append("\n");
-                                }
-                            } catch (Throwable t) {
-                                sb.append(line);
-                                sb.append("\n");
-                            }
-                        } else {
-                            sb.append(line);
-                            sb.append("\n");
-                        }
-
-                        if (lines > 200) {
-                            break;
-                        }
-
-                        ++lines;
-                    }
-
-                    if (maxLines > 300) {
-                        break;
-                    }
-
-                    ++maxLines;
-                }
-
+                sb.append(getLogCapture());
                 if (sb.length() > 0) {
-                    builder.text = sb.toString();
+                    builder.setText(sb.toString());
                     return builder.internalBuild();
                 } else {
-                    throw new Exception("Empty log");
+                    throw new Exception();
                 }
             } catch (Throwable t) {
-                Log.e("Slack Logcat Attachment", "start failed", t);
-                if (mIsCrashSummary) {
-                    builder.text = "Failed to capture crash log";
-                    return builder.internalBuild();
-                } else {
-                    return null;
-                }
+                builder.setText("Unable to read log");
+                return builder.internalBuild();
             }
         }
 
@@ -213,6 +153,22 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment {
             if (mOnSlackLogcatAttachmentAvailableListener != null) {
                 mOnSlackLogcatAttachmentAvailableListener.onSlackLogcatAttachmentAvailable(attachment, mExtras);
             }
+        }
+
+        private String getLogCapture() throws Exception {
+            Process process = Runtime.getRuntime().exec(String.format(Locale.getDefault(), "logcat -t %d", mLineCount));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (line.contains(Integer.toString(mProcessId))) {
+                    sb.append(line);
+                    sb.append("\n");
+                }
+            }
+
+            return sb.toString();
         }
     }
 }
