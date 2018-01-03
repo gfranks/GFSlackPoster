@@ -1,5 +1,7 @@
 package com.github.gfranks.slack.poster.model;
 
+import java.util.Map;
+
 public class GFSlackBuildInfoAttachment extends GFSlackAttachment {
 
     private String applicationId;
@@ -89,7 +91,6 @@ public class GFSlackBuildInfoAttachment extends GFSlackAttachment {
         sb.append("\n");
         sb.append("Date of Build: ");
         sb.append(buildDate);
-        sb.append("\n");
         setText(sb.toString());
     }
 
@@ -155,6 +156,13 @@ public class GFSlackBuildInfoAttachment extends GFSlackAttachment {
         @Override
         public Builder setText(String text) {
             super.setText(text);
+
+            return this;
+        }
+
+        @Override
+        public Builder setExtraTextFields(Map<String, String> extraTextFields) {
+            super.setExtraTextFields(extraTextFields);
 
             return this;
         }

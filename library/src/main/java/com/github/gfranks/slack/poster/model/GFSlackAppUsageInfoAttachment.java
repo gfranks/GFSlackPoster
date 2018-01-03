@@ -1,5 +1,7 @@
 package com.github.gfranks.slack.poster.model;
 
+import java.util.Map;
+
 public class GFSlackAppUsageInfoAttachment extends GFSlackAttachment {
 
     private String usedMemoryInMB;
@@ -108,6 +110,13 @@ public class GFSlackAppUsageInfoAttachment extends GFSlackAttachment {
         }
 
         @Override
+        public SimpleBuilder setExtraTextFields(Map<String, String> extraTextFields) {
+            super.setExtraTextFields(extraTextFields);
+
+            return this;
+        }
+
+        @Override
         public SimpleBuilder setFooter(String footer) {
             super.setFooter(footer);
 
@@ -170,6 +179,13 @@ public class GFSlackAppUsageInfoAttachment extends GFSlackAttachment {
         @Override
         public Builder setText(String text) {
             super.setText(text);
+
+            return this;
+        }
+
+        @Override
+        public Builder setExtraTextFields(Map<String, String> extraTextFields) {
+            super.setExtraTextFields(extraTextFields);
 
             return this;
         }

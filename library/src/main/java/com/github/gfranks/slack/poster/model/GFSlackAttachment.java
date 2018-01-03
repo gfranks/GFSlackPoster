@@ -3,7 +3,9 @@ package com.github.gfranks.slack.poster.model;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GFSlackAttachment {
 
@@ -23,12 +25,14 @@ public class GFSlackAttachment {
     private String footer;
     @SerializedName("footer_icon")
     private String footerIcon;
+    private Map<String, String> extraTextFields;
 
     public GFSlackAttachment() {
         fallback = "Attachment";
         color = "#5DA7C1";
         fields = new ArrayList<>();
         fields.add(new SlackField());
+        extraTextFields = new HashMap<>();
     }
 
     public GFSlackAttachment(Builder builder) {
@@ -47,6 +51,7 @@ public class GFSlackAttachment {
         this.text = builder.text;
         setFooter(builder.footer);
         setFooterIcon(builder.footerIcon);
+        setExtraTextFields(builder.extraTextFields);
         if ((footer != null && footer.length() > 0) || (footerIcon != null && footerIcon.length() > 0)) {
             ts = System.currentTimeMillis() / 1000;
         }
@@ -90,6 +95,7 @@ public class GFSlackAttachment {
 
     public void setText(String text) {
         this.text = text;
+        setExtraTextFields(extraTextFields);
     }
 
     public List<SlackField> getFields() {
@@ -124,12 +130,34 @@ public class GFSlackAttachment {
         }
     }
 
+    public void setExtraTextFields(Map<String, String> extraTextFields) {
+        this.extraTextFields = extraTextFields;
+
+        StringBuilder sb = new StringBuilder();
+        if (getText() != null && getText().length() > 0) {
+            sb.append(getText());
+        }
+        if (extraTextFields != null) {
+            if (sb.length() > 0) {
+                sb.append("\n");
+            }
+            for (String key : extraTextFields.keySet()) {
+                sb.append(key);
+                sb.append(": ");
+                sb.append(extraTextFields.get(key));
+                sb.append("\n");
+            }
+            text = sb.toString();
+        }
+    }
+
     public static class Builder {
 
         private String fallback;
         private String color;
         private String title;
         private String text;
+        private Map<String, String> extraTextFields;
         private String footer;
         private String footerIcon;
 
@@ -153,6 +181,12 @@ public class GFSlackAttachment {
 
         public Builder setText(String text) {
             this.text = text;
+
+            return this;
+        }
+
+        public Builder setExtraTextFields(Map<String, String> extraTextFields) {
+            this.extraTextFields = extraTextFields;
 
             return this;
         }

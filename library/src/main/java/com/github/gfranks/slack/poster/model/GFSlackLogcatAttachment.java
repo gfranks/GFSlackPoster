@@ -19,11 +19,6 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment {
         setColor("#FF4081");
     }
 
-    public void setCrashSummary(boolean crashSummary) {
-        setTitle("Logcat Summary");
-        setColor("#FF4081");
-    }
-
     public interface OnSlackLogcatAttachmentAvailableListener {
         void onSlackLogcatAttachmentAvailable(GFSlackLogcatAttachment attachment, Map<String, Object> extras);
     }
@@ -73,6 +68,13 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment {
         @Override
         public Builder setText(String text) {
             super.setText(text);
+
+            return this;
+        }
+
+        @Override
+        public Builder setExtraTextFields(Map<String, String> extraTextFields) {
+            super.setExtraTextFields(extraTextFields);
 
             return this;
         }

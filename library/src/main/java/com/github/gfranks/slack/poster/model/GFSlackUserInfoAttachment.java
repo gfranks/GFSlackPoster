@@ -1,5 +1,7 @@
 package com.github.gfranks.slack.poster.model;
 
+import java.util.Map;
+
 public class GFSlackUserInfoAttachment extends GFSlackAttachment {
 
     private String name;
@@ -133,6 +135,13 @@ public class GFSlackUserInfoAttachment extends GFSlackAttachment {
         @Override
         public Builder setText(String text) {
             super.setText(text);
+
+            return this;
+        }
+
+        @Override
+        public Builder setExtraTextFields(Map<String, String> extraTextFields) {
+            super.setExtraTextFields(extraTextFields);
 
             return this;
         }

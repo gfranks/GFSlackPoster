@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.util.DisplayMetrics;
 
+import java.util.Map;
+
 public class GFSlackDeviceInfoAttachment extends GFSlackAttachment {
 
     private String make;
@@ -164,6 +166,13 @@ public class GFSlackDeviceInfoAttachment extends GFSlackAttachment {
         }
 
         @Override
+        public SimpleBuilder setExtraTextFields(Map<String, String> extraTextFields) {
+            super.setExtraTextFields(extraTextFields);
+
+            return this;
+        }
+
+        @Override
         public SimpleBuilder setFooter(String footer) {
             super.setFooter(footer);
 
@@ -296,6 +305,13 @@ public class GFSlackDeviceInfoAttachment extends GFSlackAttachment {
         @Override
         public Builder setText(String text) {
             super.setText(text);
+
+            return this;
+        }
+
+        @Override
+        public Builder setExtraTextFields(Map<String, String> extraTextFields) {
+            super.setExtraTextFields(extraTextFields);
 
             return this;
         }
