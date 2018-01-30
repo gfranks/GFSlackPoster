@@ -1,13 +1,29 @@
 package com.github.gfranks.slack.poster.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GFSlackAttachment {
+public class GFSlackAttachment implements Parcelable, Type {
+
+    public static final Creator<GFSlackAttachment> CREATOR = new Creator<GFSlackAttachment>() {
+        @Override
+        public GFSlackAttachment createFromParcel(Parcel in) {
+            return new GFSlackAttachment(in);
+        }
+
+        @Override
+        public GFSlackAttachment[] newArray(int size) {
+            return new GFSlackAttachment[size];
+        }
+    };
 
     @SerializedName("fallback")
     private String fallback;
@@ -55,6 +71,21 @@ public class GFSlackAttachment {
         if ((footer != null && footer.length() > 0) || (footerIcon != null && footerIcon.length() > 0)) {
             ts = System.currentTimeMillis() / 1000;
         }
+    }
+
+    protected GFSlackAttachment(Parcel in) {
+        fallback = in.readString();
+        color = in.readString();
+        if (in.readByte() == 0) {
+            ts = null;
+        } else {
+            ts = in.readLong();
+        }
+        title = in.readString();
+        text = in.readString();
+        fields = in.createTypedArrayList(SlackField.CREATOR);
+        footer = in.readString();
+        footerIcon = in.readString();
     }
 
     public String getFallback() {
@@ -151,6 +182,28 @@ public class GFSlackAttachment {
         }
     }
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(fallback);
+        dest.writeString(color);
+        if (ts == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(ts);
+        }
+        dest.writeString(title);
+        dest.writeString(text);
+        dest.writeTypedList(fields);
+        dest.writeString(footer);
+        dest.writeString(footerIcon);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
     public static class Builder {
 
         private String fallback;
@@ -208,7 +261,19 @@ public class GFSlackAttachment {
         }
     }
 
-    public static class SlackField {
+    public static class SlackField implements Parcelable, Type {
+
+        public static final Creator<SlackField> CREATOR = new Creator<SlackField>() {
+            @Override
+            public SlackField createFromParcel(Parcel in) {
+                return new SlackField(in);
+            }
+
+            @Override
+            public SlackField[] newArray(int size) {
+                return new SlackField[size];
+            }
+        };
 
         @SerializedName("title")
         private String title;
@@ -219,6 +284,12 @@ public class GFSlackAttachment {
 
         public SlackField() {
             isShort = true;
+        }
+
+        protected SlackField(Parcel in) {
+            title = in.readString();
+            value = in.readString();
+            isShort = in.readByte() != 0;
         }
 
         public String getTitle() {
@@ -243,6 +314,18 @@ public class GFSlackAttachment {
 
         public void setShort(boolean aShort) {
             isShort = aShort;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel parcel, int i) {
+            parcel.writeString(title);
+            parcel.writeString(value);
+            parcel.writeByte((byte) (isShort ? 1 : 0));
         }
     }
 }

@@ -1,8 +1,24 @@
 package com.github.gfranks.slack.poster.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.lang.reflect.Type;
 import java.util.Map;
 
-public class GFSlackUserInfoAttachment extends GFSlackAttachment {
+public class GFSlackUserInfoAttachment extends GFSlackAttachment implements Parcelable, Type {
+
+    public static final Creator<GFSlackUserInfoAttachment> CREATOR = new Creator<GFSlackUserInfoAttachment>() {
+        @Override
+        public GFSlackUserInfoAttachment createFromParcel(Parcel in) {
+            return new GFSlackUserInfoAttachment(in);
+        }
+
+        @Override
+        public GFSlackUserInfoAttachment[] newArray(int size) {
+            return new GFSlackUserInfoAttachment[size];
+        }
+    };
 
     private String name;
     private String id;
@@ -11,21 +27,33 @@ public class GFSlackUserInfoAttachment extends GFSlackAttachment {
 
     public GFSlackUserInfoAttachment() {
         super();
-        setTitle("User Info");
-        setColor("#000000");
-        getFields().get(0).setShort(false);
+        init();
     }
 
     public GFSlackUserInfoAttachment(Builder builder) {
         super(builder);
-        setTitle("User Info");
-        setColor("#000000");
-        getFields().get(0).setShort(false);
+        init();
         name = builder.name;
         id = builder.id;
         email = builder.email;
         phone = builder.phone;
         setValues();
+    }
+
+    protected GFSlackUserInfoAttachment(Parcel in) {
+        super(in);
+        init();
+        name = in.readString();
+        id = in.readString();
+        email = in.readString();
+        phone = in.readString();
+        setValues();
+    }
+
+    private void init() {
+        setTitle("User Info");
+        setColor("#000000");
+        getFields().get(0).setShort(false);
     }
 
     public String getName() {
@@ -78,6 +106,19 @@ public class GFSlackUserInfoAttachment extends GFSlackAttachment {
         sb.append("Phone: ");
         sb.append(phone);
         setText(sb.toString());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(id);
+        dest.writeString(email);
+        dest.writeString(phone);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static class Builder extends GFSlackAttachment.Builder {

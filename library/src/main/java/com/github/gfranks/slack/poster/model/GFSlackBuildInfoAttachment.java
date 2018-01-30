@@ -1,8 +1,24 @@
 package com.github.gfranks.slack.poster.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.lang.reflect.Type;
 import java.util.Map;
 
-public class GFSlackBuildInfoAttachment extends GFSlackAttachment {
+public class GFSlackBuildInfoAttachment extends GFSlackAttachment implements Parcelable, Type {
+
+    public static final Creator<GFSlackBuildInfoAttachment> CREATOR = new Creator<GFSlackBuildInfoAttachment>() {
+        @Override
+        public GFSlackBuildInfoAttachment createFromParcel(Parcel in) {
+            return new GFSlackBuildInfoAttachment(in);
+        }
+
+        @Override
+        public GFSlackBuildInfoAttachment[] newArray(int size) {
+            return new GFSlackBuildInfoAttachment[size];
+        }
+    };
 
     private String applicationId;
     private String versionName;
@@ -12,22 +28,35 @@ public class GFSlackBuildInfoAttachment extends GFSlackAttachment {
 
     public GFSlackBuildInfoAttachment() {
         super();
-        setTitle("Build Info");
-        setColor("#FEC418");
-        getFields().get(0).setShort(false);
+        init();
     }
 
     public GFSlackBuildInfoAttachment(Builder builder) {
         super(builder);
-        setTitle("Build Info");
-        setColor("#FEC418");
-        getFields().get(0).setShort(false);
+        init();
         applicationId = builder.applicationId;
         versionName = builder.versionName;
         versionCode = builder.versionCode;
         sha = builder.sha;
         buildDate = builder.buildDate;
         setValues();
+    }
+
+    protected GFSlackBuildInfoAttachment(Parcel in) {
+        super(in);
+        init();
+        applicationId = in.readString();
+        versionName = in.readString();
+        versionCode = in.readString();
+        sha = in.readString();
+        buildDate = in.readString();
+        setValues();
+    }
+
+    private void init() {
+        setTitle("Build Info");
+        setColor("#FEC418");
+        getFields().get(0).setShort(false);
     }
 
     public String getApplicationId() {
@@ -92,6 +121,21 @@ public class GFSlackBuildInfoAttachment extends GFSlackAttachment {
         sb.append("Date of Build: ");
         sb.append(buildDate);
         setText(sb.toString());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeString(applicationId);
+        dest.writeString(versionName);
+        dest.writeString(versionCode);
+        dest.writeString(sha);
+        dest.writeString(buildDate);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static class Builder extends GFSlackAttachment.Builder {

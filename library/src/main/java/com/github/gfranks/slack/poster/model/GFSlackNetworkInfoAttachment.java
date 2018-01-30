@@ -1,27 +1,53 @@
 package com.github.gfranks.slack.poster.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.lang.reflect.Type;
 import java.util.Map;
 
-public class GFSlackNetworkInfoAttachment extends GFSlackAttachment {
+public class GFSlackNetworkInfoAttachment extends GFSlackAttachment implements Parcelable, Type {
+
+    public static final Creator<GFSlackNetworkInfoAttachment> CREATOR = new Creator<GFSlackNetworkInfoAttachment>() {
+        @Override
+        public GFSlackNetworkInfoAttachment createFromParcel(Parcel in) {
+            return new GFSlackNetworkInfoAttachment(in);
+        }
+
+        @Override
+        public GFSlackNetworkInfoAttachment[] newArray(int size) {
+            return new GFSlackNetworkInfoAttachment[size];
+        }
+    };
 
     private String apiVersion;
     private String environment;
 
     public GFSlackNetworkInfoAttachment() {
         super();
-        setTitle("Networking Info");
-        setColor("#3DB766");
-        getFields().get(0).setShort(false);
+        init();
     }
 
     public GFSlackNetworkInfoAttachment(Builder builder) {
         super(builder);
-        setTitle("Networking Info");
-        setColor("#3DB766");
-        getFields().get(0).setShort(false);
+        init();
         apiVersion = builder.apiVersion;
         environment = builder.environment;
         setValues();
+    }
+
+    protected GFSlackNetworkInfoAttachment(Parcel in) {
+        super(in);
+        init();
+        apiVersion = in.readString();
+        environment = in.readString();
+        setValues();
+    }
+
+    private void init() {
+        setTitle("Networking Info");
+        setColor("#3DB766");
+        getFields().get(0).setShort(false);
     }
 
     public String getApiVersion() {
@@ -50,6 +76,17 @@ public class GFSlackNetworkInfoAttachment extends GFSlackAttachment {
         sb.append("Environment: ");
         sb.append(environment);
         setText(sb.toString());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(apiVersion);
+        dest.writeString(environment);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static class Builder extends GFSlackAttachment.Builder {

@@ -1,26 +1,52 @@
 package com.github.gfranks.slack.poster.model;
 
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.Locale;
 import java.util.Map;
 
-public class GFSlackLogcatAttachment extends GFSlackAttachment {
+public class GFSlackLogcatAttachment extends GFSlackAttachment implements Parcelable, Type {
 
-    private GFSlackLogcatAttachment() {
+    public static final Creator<GFSlackLogcatAttachment> CREATOR = new Creator<GFSlackLogcatAttachment>() {
+        @Override
+        public GFSlackLogcatAttachment createFromParcel(Parcel in) {
+            return new GFSlackLogcatAttachment(in);
+        }
+
+        @Override
+        public GFSlackLogcatAttachment[] newArray(int size) {
+            return new GFSlackLogcatAttachment[size];
+        }
+    };
+
+    public GFSlackLogcatAttachment() {
         super();
+        init();
+    }
+
+    protected GFSlackLogcatAttachment(Parcel in) {
+        super(in);
+        init();
     }
 
     private GFSlackLogcatAttachment(Builder builder) {
         super(builder);
+        init();
+    }
+
+    private void init() {
         setTitle("Logcat Summary");
         setColor("#FF4081");
     }
 
     public interface OnSlackLogcatAttachmentAvailableListener {
-        void onSlackLogcatAttachmentAvailable(GFSlackLogcatAttachment attachment, Map<String, Object> extras);
+        void onSlackLogcatAttachmentAvailable(GFSlackLogcatAttachment attachment, Bundle extras);
     }
 
     public static class Builder extends GFSlackAttachment.Builder {
@@ -95,7 +121,7 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment {
 
         @Override
         public GFSlackAttachment build() {
-            throw new IllegalStateException("You must call #build(OnSlackLogcatAttachmentCompletionListener onSlackLogcatAttachmentCompletionListener) or #build(Map<String, Object> extras, OnSlackLogcatAttachmentCompletionListener onSlackLogcatAttachmentCompletionListener)");
+            throw new IllegalStateException("You must call #build(OnSlackLogcatAttachmentCompletionListener onSlackLogcatAttachmentCompletionListener) or #build(Bundle extras, OnSlackLogcatAttachmentCompletionListener onSlackLogcatAttachmentCompletionListener)");
         }
 
         public void build(OnSlackLogcatAttachmentAvailableListener onSlackLogcatAttachmentAvailableListener) {
@@ -105,7 +131,7 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment {
             new LogcatAsyncTask(processId, lineCount, null, onSlackLogcatAttachmentAvailableListener).execute(this);
         }
 
-        public void build(Map<String, Object> extras, OnSlackLogcatAttachmentAvailableListener onSlackLogcatAttachmentAvailableListener) {
+        public void build(Bundle extras, OnSlackLogcatAttachmentAvailableListener onSlackLogcatAttachmentAvailableListener) {
             if (processId == null) {
                 throw new IllegalStateException("You must set a process id -- #setProcessId(int) on the builder");
             }
@@ -121,10 +147,10 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment {
 
         private int mProcessId;
         private int mLineCount;
-        private Map<String, Object> mExtras;
+        private Bundle mExtras;
         private OnSlackLogcatAttachmentAvailableListener mOnSlackLogcatAttachmentAvailableListener;
 
-        public LogcatAsyncTask(int processId, int lineCount, Map<String, Object> extras, OnSlackLogcatAttachmentAvailableListener onSlackLogcatAttachmentAvailableListener) {
+        public LogcatAsyncTask(int processId, int lineCount, Bundle extras, OnSlackLogcatAttachmentAvailableListener onSlackLogcatAttachmentAvailableListener) {
             mProcessId = processId;
             mLineCount = lineCount;
             mExtras = extras;

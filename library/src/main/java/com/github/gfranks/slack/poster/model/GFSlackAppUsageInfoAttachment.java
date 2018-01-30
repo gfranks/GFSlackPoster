@@ -1,8 +1,24 @@
 package com.github.gfranks.slack.poster.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.lang.reflect.Type;
 import java.util.Map;
 
-public class GFSlackAppUsageInfoAttachment extends GFSlackAttachment {
+public class GFSlackAppUsageInfoAttachment extends GFSlackAttachment implements Parcelable, Type {
+
+    public static final Creator<GFSlackAppUsageInfoAttachment> CREATOR = new Creator<GFSlackAppUsageInfoAttachment>() {
+        @Override
+        public GFSlackAppUsageInfoAttachment createFromParcel(Parcel in) {
+            return new GFSlackAppUsageInfoAttachment(in);
+        }
+
+        @Override
+        public GFSlackAppUsageInfoAttachment[] newArray(int size) {
+            return new GFSlackAppUsageInfoAttachment[size];
+        }
+    };
 
     private String usedMemoryInMB;
     private String maxHeapSizeInMB;
@@ -10,20 +26,31 @@ public class GFSlackAppUsageInfoAttachment extends GFSlackAttachment {
 
     public GFSlackAppUsageInfoAttachment() {
         super();
-        setTitle("App Usage");
-        setColor("#FFA500");
-        getFields().get(0).setShort(false);
+        init();
     }
 
     public GFSlackAppUsageInfoAttachment(Builder builder) {
         super(builder);
-        setTitle("App Usage");
-        setColor("#FFA500");
-        getFields().get(0).setShort(false);
+        init();
         usedMemoryInMB = builder.usedMemoryInMB;
         maxHeapSizeInMB = builder.maxHeapSizeInMB;
         availableHeapSizeInMB = builder.availableHeapSizeInMB;
         setValues();
+    }
+
+    protected GFSlackAppUsageInfoAttachment(Parcel in) {
+        super(in);
+        init();
+        usedMemoryInMB = in.readString();
+        maxHeapSizeInMB = in.readString();
+        availableHeapSizeInMB = in.readString();
+        setValues();
+    }
+
+    private void init() {
+        setTitle("App Usage");
+        setColor("#FFA500");
+        getFields().get(0).setShort(false);
     }
 
     public String getUsedMemoryInMB() {
@@ -67,6 +94,19 @@ public class GFSlackAppUsageInfoAttachment extends GFSlackAttachment {
         sb.append(availableHeapSizeInMB);
         sb.append(" MB");
         setText(sb.toString());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeString(usedMemoryInMB);
+        dest.writeString(maxHeapSizeInMB);
+        dest.writeString(availableHeapSizeInMB);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static class SimpleBuilder extends Builder {

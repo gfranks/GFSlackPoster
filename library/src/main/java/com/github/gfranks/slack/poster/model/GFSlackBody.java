@@ -1,10 +1,26 @@
 package com.github.gfranks.slack.poster.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
-public class GFSlackBody {
+public class GFSlackBody implements Parcelable, Type {
+
+    public static final Creator<GFSlackBody> CREATOR = new Creator<GFSlackBody>() {
+        @Override
+        public GFSlackBody createFromParcel(Parcel in) {
+            return new GFSlackBody(in);
+        }
+
+        @Override
+        public GFSlackBody[] newArray(int size) {
+            return new GFSlackBody[size];
+        }
+    };
 
     @SerializedName("text")
     private String text;
@@ -37,6 +53,13 @@ public class GFSlackBody {
         }
 
         attachments = builder.attachments;
+    }
+
+    protected GFSlackBody(Parcel in) {
+        text = in.readString();
+        channel = in.readString();
+        username = in.readString();
+        iconEmoji = in.readString();
     }
 
     public String getText() {
@@ -97,6 +120,19 @@ public class GFSlackBody {
      */
     public void setAttachments(List<GFSlackAttachment> attachments) {
         this.attachments = attachments;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(text);
+        dest.writeString(channel);
+        dest.writeString(username);
+        dest.writeString(iconEmoji);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static class Builder {
