@@ -12,7 +12,6 @@ import android.widget.Toast;
 import com.github.gfranks.slack.poster.GFSlackPoster;
 import com.github.gfranks.slack.poster.model.GFSlackAppUsageInfoAttachment;
 import com.github.gfranks.slack.poster.model.GFSlackAttachment;
-import com.github.gfranks.slack.poster.model.GFSlackBody;
 import com.github.gfranks.slack.poster.model.GFSlackBuildInfoAttachment;
 import com.github.gfranks.slack.poster.model.GFSlackDeviceInfoAttachment;
 import com.github.gfranks.slack.poster.model.GFSlackLogcatAttachment;
@@ -29,8 +28,14 @@ import retrofit2.Response;
 
 public class SampleActivity extends AppCompatActivity implements View.OnClickListener {
 
-    EditText mWebhook1, mWebhook2, mWebhook3, mChannel, mMessage;
-    CheckBox mIncludeLogcat;
+    private EditText mWebhook1;
+    private EditText mWebhook2;
+    private EditText mWebhook3;
+    private EditText mChannel;
+    private EditText mMessage;
+    private CheckBox mIncludeLogcat;
+
+    private GFSlackPoster mSlackPoster;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,34 +51,16 @@ public class SampleActivity extends AppCompatActivity implements View.OnClickLis
         mMessage = (EditText) findViewById(R.id.message);
         mIncludeLogcat = (CheckBox) findViewById(R.id.include_logcat);
         findViewById(R.id.submit).setOnClickListener(this);
+
+        mSlackPoster = GFSlackPoster.get();
     }
 
     @Override
     public void onClick(View view) {
-        final Callback<ResponseBody> callback = new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (isFinishing()) {
-                    return;
-                }
-
-                if (response.isSuccessful()) {
-                    Toast.makeText(SampleActivity.this, "Post successful", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(SampleActivity.this, "Post unsuccessful", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                if (isFinishing()) {
-                    return;
-                }
-
-                Toast.makeText(SampleActivity.this, "An error occurred: " + t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        };
-
+        mSlackPoster.overrideDefaults(new GFSlackPoster.Builder()
+                .setWebhookPath1(mWebhook1.getText().toString())
+                .setWebhookPath1(mWebhook2.getText().toString())
+                .setWebhookPath1(mWebhook3.getText().toString()));
         if (mIncludeLogcat.isChecked()) {
             new GFSlackLogcatAttachment.Builder()
                     .setProcessId(android.os.Process.myPid())
@@ -85,17 +72,18 @@ public class SampleActivity extends AppCompatActivity implements View.OnClickLis
                                 attachment.setTs(System.currentTimeMillis() / 1000);
                                 attachments.add(attachment);
                             }
-                            GFSlackPoster slackPoster = GFSlackPoster.newInstance(mWebhook1.getText().toString(), mWebhook2.getText().toString(), mWebhook3.getText().toString());
-                            GFSlackBody slackBody = slackPoster.createSlackBody(getString(R.string.app_name), mMessage.getText().toString(), attachments);
-                            slackBody.setChannel(mChannel.getText().toString());
-                            slackPoster.postToSlack(slackBody, callback);
+
+                            mSlackPoster.postToSlack(new GFSlackPoster.SlackBodyBuilder()
+                                    .setChannel(mChannel.getText().toString())
+                                    .setText(mMessage.getText().toString())
+                                    .setAttachments(attachments), getCallback());
                         }
                     });
         } else {
-            GFSlackPoster slackPoster = GFSlackPoster.newInstance(mWebhook1.getText().toString(), mWebhook2.getText().toString(), mWebhook3.getText().toString());
-            GFSlackBody slackBody = slackPoster.createSlackBody(getString(R.string.app_name), mMessage.getText().toString(), getAttachments());
-            slackBody.setChannel(mChannel.getText().toString());
-            slackPoster.postToSlack(slackBody, callback);
+            mSlackPoster.postToSlack(new GFSlackPoster.SlackBodyBuilder()
+                    .setChannel(mChannel.getText().toString())
+                    .setText(mMessage.getText().toString())
+                    .setAttachments(getAttachments()), getCallback());
         }
 
     }
@@ -126,5 +114,31 @@ public class SampleActivity extends AppCompatActivity implements View.OnClickLis
                 .setEmail("slack_poster_sample@gmail.com")
                 .setPhone("123-456-7890")
                 .build();
+    }
+
+    private Callback<ResponseBody> getCallback() {
+        return new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (isFinishing()) {
+                    return;
+                }
+
+                if (response.isSuccessful()) {
+                    Toast.makeText(SampleActivity.this, "Post successful", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(SampleActivity.this, "Post unsuccessful", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                if (isFinishing()) {
+                    return;
+                }
+
+                Toast.makeText(SampleActivity.this, "An error occurred: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        };
     }
 }
