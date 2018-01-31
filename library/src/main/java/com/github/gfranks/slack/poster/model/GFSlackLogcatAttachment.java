@@ -51,11 +51,19 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment implements Parcel
 
     public static class Builder extends GFSlackAttachment.Builder {
 
+        private String command;
         private Integer processId;
         private int lineCount;
 
         public Builder() {
+            command = "logcat -t %d";
             lineCount = 125;
+        }
+
+        public Builder setCommand(String command) {
+            this.command = command;
+
+            return this;
         }
 
         public Builder setProcessId(int processId) {
@@ -128,14 +136,14 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment implements Parcel
             if (processId == null) {
                 throw new IllegalStateException("You must set a process id -- #setProcessId(int) on the builder");
             }
-            new LogcatAsyncTask(processId, lineCount, null, onSlackLogcatAttachmentAvailableListener).execute(this);
+            new LogcatAsyncTask(command, processId, lineCount, null, onSlackLogcatAttachmentAvailableListener).execute(this);
         }
 
         public void build(Bundle extras, OnSlackLogcatAttachmentAvailableListener onSlackLogcatAttachmentAvailableListener) {
             if (processId == null) {
                 throw new IllegalStateException("You must set a process id -- #setProcessId(int) on the builder");
             }
-            new LogcatAsyncTask(processId, lineCount, extras, onSlackLogcatAttachmentAvailableListener).execute(this);
+            new LogcatAsyncTask(command, processId, lineCount, extras, onSlackLogcatAttachmentAvailableListener).execute(this);
         }
 
         GFSlackLogcatAttachment internalBuild() {
@@ -145,12 +153,14 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment implements Parcel
 
     private static class LogcatAsyncTask extends AsyncTask<GFSlackLogcatAttachment.Builder, Void, GFSlackLogcatAttachment> {
 
+        private String mCommand;
         private int mProcessId;
         private int mLineCount;
         private Bundle mExtras;
         private OnSlackLogcatAttachmentAvailableListener mOnSlackLogcatAttachmentAvailableListener;
 
-        public LogcatAsyncTask(int processId, int lineCount, Bundle extras, OnSlackLogcatAttachmentAvailableListener onSlackLogcatAttachmentAvailableListener) {
+        public LogcatAsyncTask(String command, int processId, int lineCount, Bundle extras, OnSlackLogcatAttachmentAvailableListener onSlackLogcatAttachmentAvailableListener) {
+            mCommand = command;
             mProcessId = processId;
             mLineCount = lineCount;
             mExtras = extras;
@@ -184,7 +194,7 @@ public class GFSlackLogcatAttachment extends GFSlackAttachment implements Parcel
         }
 
         private String getLogCapture() throws Exception {
-            Process process = Runtime.getRuntime().exec(String.format(Locale.getDefault(), "logcat -t %d", mLineCount));
+            Process process = Runtime.getRuntime().exec(String.format(Locale.getDefault(), mCommand, mLineCount));
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
             StringBuilder sb = new StringBuilder();
