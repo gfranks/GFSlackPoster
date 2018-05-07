@@ -108,7 +108,7 @@ public class GFSlackPoster {
                 .setChannel(builder.channel)
                 .setText(builder.text)
                 .setIconEmoji(builder.iconEmoji)
-                .setAttachments(builder.attachments).build());
+                .setAttachments(builder.attachments).build(), callback);
     }
 
     /**
